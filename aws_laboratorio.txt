@@ -16,8 +16,8 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
 1. ELENCO VPC
 aws ec2 describe-vpcs
 
-1.a -- ottenere direttamente il VpcId
-aws ec2 describe-vpcs --output text --query 'Vpcs[*].VpcId'
+	1.a -- ottenere direttamente il VpcId
+	aws ec2 describe-vpcs --output text --query 'Vpcs[*].VpcId'
 
 2. ELENCO LE SUBNET
 aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-5f070938"
@@ -25,11 +25,6 @@ aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-5f070938"
 
 3. CREO SECURITY GROUP SSH
 aws ec2 create-security-group --group-name sshAccessTest --description "enable ssh access for all"
-
-{
-    "GroupId": "sg-58e78825"
-}
-
 
 	3.a INFORMAZIONI DEL SSCURITY GROUP
 	aws ec2 describe-security-groups --group-names sshAccessTest
