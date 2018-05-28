@@ -81,9 +81,58 @@ aws ec2 start-instances --instance-ids i-05742fe8698787358
 aws ec2 describe-instances --instance-ids i-03964533dfb2716c7 --output text --query 'Reservations[*].Instances[*].InstanceType'
 
 
+### CREARE UNA ISTANZA RDS
+
+1. CREARE ISTANZA DB (engine mysql)
+aws rds create-db-instance --db-instance-identifier dbtest-0001 --db-instance-class db.t2.small --engine mysql \
+--allocated-storage 5 --master-username myawsadmin --master-user-password myawsadmin0123!
+
+2. CREARE UNO SNAPSHOT
+aws rds create-db-snapshot --db-snapshot-identifier dbtest-0001-snapshot-0001 --db-instance-identifier dbtest-0001
+
+3. MODIFICARE ISTANZA DB
+
+    3.a appplicare le modifiche immediatamente
+    aws rds modify-db-instance --db-instance-identifier dbtest-0001 --allocated-storage 10 --apply-immediately
+    aws rds modify-db-instance --db-instance-identifier dbtest-0001 --db-instance-class db.t2.medium --apply-immediately
+
+    3.b lasciare che le modifiche vengano applicate durante la successiva finestra di manutenzione
+    aws rds modify-db-instance --db-instance-identifier dbtest-0001 --allocated-storage 10
+    aws rds modify-db-instance --db-instance-identifier dbtest-0001 --db-instance-class db.t2.medium
+
+    3.c Bonus track: per essere sicuri di tutto quello che è possibile modificare all'istanza db
+    aws rds describe-valid-db-instance-modifications --db-instance-identifier dbtest-0001
 
 
+### CREARE UN BUCKET S3
 
+1. CREARE BUCKET 
+aws s3api create-bucket --bucket angrybucket0001 --create-bucket-configuration LocationConstraint=eu-west-1
+
+    1.a per creare un bucket nella regione default us-east-1 è sufficiente --region us-east-1
+    1.b per creare un bucket fuori dalla regione us-east-1 è necessario specificare la locazione l'appropriata LocationConstraint
+
+2. AGGIUNGERE UN OGGETTO
+aws s3api put-object --bucket angrybucket0001 --key prova.txt
+
+    2.a CREARE UN OGGETTO DI TIPO DIRECTORY
+    aws s3api put-object --bucket angrybucket0001 --key test_dir/
+
+    3.a AGGIUNGERE UN OGGETTO
+    aws s3api put-object --bucket angrybucket0001 --key test_dir/prova.txt
+
+3. MUOVERE UN OGGETTO
+aws s3api delete-object --bucket angrybucket0001 --key test_dir/prova.txt
+
+4. CANCELLARE UN BUCKET
+    4.a aws s3api delete-bucket --bucket angrybucket0001
+    - attenzione il bucket deve essere vuoto
+
+    4.b aws s3api delete-object --bucket angrybucket0001 --key test_dir/
+
+    4.c aws s3api delete-object --bucket angrybucket0001 --key prova.txt
+
+    4.d aws s3api list-objects --bucket angrybucket0001
 
 
 
