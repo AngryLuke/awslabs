@@ -1,0 +1,105 @@
+Istruzioni per configurare la CLI
+
+1. installare python, pip a cli
+
+2. creare un utente ed ottenere il file csv credentials
+
+3. configurare la CLI
+https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
+
+
+
+
+### CREARE UNA ISTANZA EC2 WEB-SERVER
+
+
+1. ELENCO VPC
+aws ec2 describe-vpcs
+
+1.a -- ottenere direttamente il VpcId
+aws ec2 describe-vpcs --output text --query 'Vpcs[*].VpcId'
+
+2. ELENCO LE SUBNET
+aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-5f070938"
+
+
+3. CREO SECURITY GROUP SSH
+aws ec2 create-security-group --group-name sshAccessTest --description "enable ssh access for all"
+
+{
+    "GroupId": "sg-58e78825"
+}
+
+
+	3.a INFORMAZIONI DEL SSCURITY GROUP
+	aws ec2 describe-security-groups --group-names sshAccessTest
+
+	3.b AGGIUNGERE UNA REGOLA AL SECURITY GROUP
+	aws ec2 authorize-security-group-ingress --group-id sg-58e78825 --protocol tcp --port 22 --cidr 0.0.0.0/0
+
+	3.c INFORMAZIONI DEL SECURITY GROUP
+	aws ec2 describe-security-groups --group-names sshAccessTest
+	
+
+4. CREO SECURITY GROUP HTTPS
+aws ec2 create-security-group --group-name httpsAccessTest --description "enable https access for all"
+
+	4.a
+	aws ec2 authorize-security-group-ingress --group-id sg-19cba464 --protocol tcp --port 443 --cidr 0.0.0.0/0
+
+	4.b
+	aws ec2 describe-security-groups --group-names httpsAccessTest
+
+
+5. CREO SECURITY GROUP HTTP
+aws ec2 create-security-group --group-name httpAccessTest --description "enable https access for all"
+
+	5.a
+	aws ec2 authorize-security-group-ingress --group-id sg-40c4ab3d --protocol tcp --port 80 --cidr 0.0.0.0/0
+
+	5.b
+	aws ec2 describe-security-groups --group-names httpAccessTest
+
+
+6. CREO CHIAVE SSH
+aws ec2 create-key-pair --key-name nginxTest --query 'KeyMaterial' --output text > /home/ec2-user/.ssh/nginxTest.pem
+
+
+7. CREO EC2
+aws ec2 run-instances --image-id ami-921423eb --count 1 --instance-type t2.micro --key-name nginxTest \
+--subnet-id subnet-d482b89d --security-group-ids sg-40c4ab3d sg-19cba464 sg-58e78825 \
+--user-data file://user_data_script_ami.txt
+
+
+### SCALING UP ISTANZA (change instance-type)
+
+8 . STOP ISTANZA
+aws ec2 stop-instances --instance-ids i-03964533dfb2716c7
+
+9. MODIFICO TIPO DI ISTANZA
+aws ec2 modify-instance-attribute --instance-id i-03964533dfb2716c7 --instance-type t2.medium
+
+10. AVVIO ISTANZA EC2
+aws ec2 start-instances --instance-ids i-05742fe8698787358
+
+11. DESCRIVO IL TIPO DI ISTANZA
+aws ec2 describe-instances --instance-ids i-03964533dfb2716c7 --output text --query 'Reservations[*].Instances[*].InstanceType'
+
+
+
+
+
+
+
+
+
+
+
+Bonus track
+###### ASSOCIARE ELASTIC IP AD ISTANZA
+
+CREO ELASTIC IP
+aws ec2 allocate-address --domain "vpc" --region eu-west-1
+
+ASSOCIO ELASTIC IP
+aws ec2 associate-address --allocation-id "eipalloc-f7a4deca" --instance-id "i-0a658ffafbbe74d48" --no-allow-reassociation --region eu-west-1
