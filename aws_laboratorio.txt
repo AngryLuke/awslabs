@@ -1,3 +1,4 @@
+
 Istruzioni per configurare la CLI
 
 1. installare python, pip a cli
@@ -11,7 +12,6 @@ https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
 
 
 ### CREARE UNA ISTANZA EC2 WEB-SERVER
-
 
 1. ELENCO VPC
 aws ec2 describe-vpcs
